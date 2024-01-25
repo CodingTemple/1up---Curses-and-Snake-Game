@@ -6,16 +6,17 @@ def main(win):
     win = curses.newwin(20, 60, 0, 0) 
 
     # Configure the window
-    win.keypad(1)  # Enable keypad mode to capture key presses
-    curses.noecho()  # Turn off automatic echoing of keys to the window
+    win.keypad(1)       # Enable keypad mode to capture key presses
+    curses.noecho()     # Turn off automatic echoing of keys to the window
     curses.curs_set(0)  # Make the cursor invisible
-    win.border(0)  # Draw a border around the window
-    win.nodelay(1)  # Make getch() non-blocking
+    win.border(0)       # Draw a border around the window
+    win.nodelay(1)      # Make getch() non-blocking
 
     # Initialize the snake and food
     snake = [(4, 10), (4, 9), (4, 8)]  # Starting coordinates of the snake
     food = (10, 20)  # Coordinates of the first food item
-
+    bounds_y=(0,19)
+    bounds_x=(0,59)
     # Set of allowed movement keys (arrow keys)
     allowed_moves = (curses.KEY_LEFT, curses.KEY_RIGHT, curses.KEY_UP, curses.KEY_DOWN)
 
@@ -32,7 +33,7 @@ def main(win):
 
     # Game logic setup
     score = 0  # Initialize score
-    ESC = 27  # ASCII value of the Escape key
+    ESC = 27   # ASCII value of the Escape key
     key = curses.KEY_RIGHT  # Initial movement direction of the snake
 
     try:
@@ -43,7 +44,7 @@ def main(win):
             # Set the speed of the game
             win.timeout(150 - (len(snake)) // 5 + len(snake) // 10 % 120)
 
-            prev_key = key  # Store the previous key pressed
+            prev_key = key       # Store the previous key pressed
             event = win.getch()  # Get the current key pressed
             key = event if event in allowed_moves else prev_key  # Update key if it's an allowed move
 
@@ -70,7 +71,8 @@ def main(win):
             snake.insert(0, (y, x))
 
             # Check for collisions with the border or the snake itself
-            if y == 1 or y == 18 or x == 0 or x == 58 or snake[0] in snake[1:]:
+            if y in bounds_y or x in bounds_x or snake[0] in snake[1:]:
+                print(f"Game Over, Your Score was {score}")
                 break  # End the game if a collision occurs
 
             # Check if the snake has gotten the food
@@ -79,7 +81,7 @@ def main(win):
                 # Generate new food position
                 food = ()
                 while food == ():
-                    food = (randint(1, 18), randint(1, 58))
+                    food = (randint(bounds_y[0]+1,bounds_y[1]-1), randint(bounds_x[0]+1,bounds_x[1]-1))
                     if food in snake:
                         food = ()
                 win.addch(food[0], food[1], '*')  # Place new food
